@@ -1,0 +1,239 @@
+Щоб реалізувати паттерн Абстрактна фабрика гри "5 у ряд" в окремій DLL бібліотеці, можна створити такі класи:
+IBoard - інтерфейс, що визначає функціональність дошки для гри "5 у ряд".
+StandardBoard - клас, що реалізує інтерфейс IBoard для стандартної дошки.
+BigBoard - клас, що реалізує інтерфейс IBoard для більшої дошки.
+ISymbol - інтерфейс, що визначає функціональність символу для гри "5 у ряд".
+XSymbol - клас, що реалізує інтерфейс ISymbol для символу "X".
+OSymbol - клас, що реалізує інтерфейс ISymbol для символу "O".
+IPlayer - інтерфейс, що визначає функціональність гравця для гри "5 у ряд".
+HumanPlayer - клас, що реалізує інтерфейс IPlayer для людини.
+ComputerPlayer - клас, що реалізує інтерфейс IPlayer для комп'ютера.
+IGameFactory - інтерфейс, що визначає функціональність фабрики для гри "5 у ряд".
+StandardGameFactory - клас, що реалізує інтерфейс IGameFactory для створення гри зі стандартною дошкою та символами.
+BigGameFactory - клас, що реалізує інтерфейс IGameFactory для створення гри з більшою дошкою та символами.
+В StandardGameFactory і BigGameFactory можна реалізувати методи створення об'єктів для дошки, символу та гравців, які відповідатимуть відповідним інтерфейсам. 
+Також можна визначити методи для створення гри, які будуть використовувати ці об'єкти для створення гри "5 у ряд" зі стандартною або більшою дошкою.
+Наприклад, код для класу StandardGameFactory може виглядати наступним чином:
+
+public class StandardGameFactory : IGameFactory
+{
+    public IBoard CreateBoard()
+    {
+        return new StandardBoard();
+    }
+
+    public ISymbol CreateSymbol(string symbolType)
+    {
+        switch (symbolType)
+        {
+            case "X":
+                return new XSymbol();
+            case "O":
+                return new OSymbol();
+            default:
+                throw new ArgumentException("Invalid symbol type");
+        }
+    }
+
+    public IPlayer CreatePlayer(string playerType, string symbolType)
+    {
+        ISymbol symbol = CreateSymbol(symbolType);
+        
+        switch (playerType)
+        {
+            case "Human":
+                return new HumanPlayer(symbol);
+            case "Computer":
+                return new ComputerPlayer(symbol);
+            default:
+                throw new ArgumentException("Invalid player type");
+        }
+    }
+
+    public IGame CreateGame(IPlayer player1, IPlayer player2)
+    {
+        IBoard board = CreateBoard();
+        return new FiveInARowGame(board, player1, player2);
+    }
+}
+А код для класу BigGameFactory може виглядати наступним чином:
+public class BigGameFactory : IGameFactory
+{
+    public IBoard CreateBoard()
+    {
+        return new BigBoard();
+    }
+
+    public ISymbol CreateSymbol(string symbolType)
+    {
+        switch (symbolType)
+        {
+            case "X":
+                return new XSymbol();
+            case "O":
+                return new OSymbol();
+            default:
+                throw new ArgumentException("Invalid symbol type");
+        }
+    }
+
+    public IPlayer CreatePlayer(string playerType, string symbolType)
+    {
+        ISymbol symbol = CreateSymbol(symbolType);
+        
+        switch (playerType)
+        {
+            case "Human":
+                return new HumanPlayer(symbol);
+            case "Computer":
+                return new ComputerPlayer(symbol);
+            default:
+                throw new ArgumentException("Invalid player type");
+        }
+    }
+
+    public IGame CreateGame(IPlayer player1, IPlayer player2)
+    {
+        IBoard board = CreateBoard();
+        return new FiveInARowGame(board, player1, player2);
+    }
+}
+
+Далі можна скомпілювати ці класи до DLL бібліотеки та використовувати їх у проектах, які підтримують .NET Framework або .NET Core.
+Після того, як ми скомпілюємо DLL бібліотеку, ми можемо її використати в будь-якому .NET проекті.
+Для цього необхідно додати посилання на бібліотеку та імпортувати простір імен, що містить класи для роботи з фабриками гри.
+Для того, щоб використати StandardGameFactory, необхідно спочатку додати посилання на DLL бібліотеку, яка містить клас StandardGameFactory. 
+Для цього в Visual Studio потрібно виконати наступні дії:
+У дереві проекту клацніть правою кнопкою миші на розділі "References" та виберіть опцію "Add Reference".
+У вікні "Reference Manager" виберіть вкладку "Browse" та знайдіть файл DLL бібліотеки з класами для фабрики гри "5 у ряд".
+Виберіть файл та натисніть кнопку "Add".
+Тепер бібліотека буде додана до списку посилань.
+Далі потрібно імпортувати простір імен, що містить класи для роботи з фабрикою гри, наприклад:
+
+using FiveInARow.Game;
+using FiveInARow.Game.Factories;
+Після цього можна створити екземпляр фабрики та використати його для створення гри:
+
+IGameFactory gameFactory = new StandardGameFactory();
+IPlayer player1 = gameFactory.CreatePlayer("Human", "X");
+IPlayer player2 = gameFactory.CreatePlayer("Computer", "O");
+IGame game = gameFactory.CreateGame(player1, player2);
+Для використання BigGameFactory потрібно повторити вищенаведені кроки з додаванням посилання на відповідну DLL бібліотеку та імпортування потрібного простору імен. 
+Після цього можна створити екземпляр фабрики та використати його для створення гри за допомогою аналогічного коду:
+
+IGameFactory gameFactory = new BigGameFactory();
+IPlayer player1 = gameFactory.CreatePlayer("Human", "X");
+IPlayer player2 = gameFactory.CreatePlayer("Computer", "O");
+IGame game = gameFactory.CreateGame(player1, player2);
+
+Для того, щоб додати можливість зберігати та завантажувати стан гри, необхідно розширити фабрики гри. 
+Для цього можна створити новий інтерфейс IGameFactoryWithSerialization, який додасть методи для зберігання та завантаження гри.
+
+public interface IGameFactoryWithSerialization : IGameFactory
+{
+    IGame LoadGame(string serializedGame);
+    string SaveGame(IGame game);
+}
+
+Клас StandardGameFactory буде мати наступну реалізацію цього інтерфейсу:
+
+public class StandardGameFactory : IGameFactoryWithSerialization
+{
+    public IGame CreateGame(IPlayer player1, IPlayer player2)
+    {
+        return new GameBoard(player1, player2);
+    }
+
+    public IPlayer CreatePlayer(string type, string mark)
+    {
+        if (type.Equals("Human", StringComparison.OrdinalIgnoreCase))
+        {
+            return new HumanPlayer(mark);
+        }
+        else if (type.Equals("Computer", StringComparison.OrdinalIgnoreCase))
+        {
+            return new ComputerPlayer(mark);
+        }
+        else
+        {
+            throw new ArgumentException($"Invalid player type: {type}", nameof(type));
+        }
+    }
+
+    public string SaveGame(IGame game)
+    {
+        GameBoard gameBoard = (GameBoard)game;
+        return gameBoard.Serialize();
+    }
+
+    public IGame LoadGame(string serializedGame)
+    {
+        return GameBoard.Deserialize(serializedGame);
+    }
+}
+
+Клас BigGameFactory також має бути розширений для підтримки збереження та завантаження гри:
+
+public class BigGameFactory : IGameFactoryWithSerialization
+{
+    public IGame CreateGame(IPlayer player1, IPlayer player2)
+    {
+        return new BigGameBoard(player1, player2);
+    }
+
+    public IPlayer CreatePlayer(string type, string mark)
+    {
+        if (type.Equals("Human", StringComparison.OrdinalIgnoreCase))
+        {
+            return new HumanPlayer(mark);
+        }
+        else if (type.Equals("Computer", StringComparison.OrdinalIgnoreCase))
+        {
+            return new ComputerPlayer(mark);
+        }
+        else
+        {
+            throw new ArgumentException($"Invalid player type: {type}", nameof(type));
+        }
+    }
+
+    public string SaveGame(IGame game)
+    {
+        BigGameBoard gameBoard = (BigGameBoard)game;
+        return gameBoard.Serialize();
+    }
+
+    public IGame LoadGame(string serializedGame)
+    {
+        return BigGameBoard.Deserialize(serializedGame);
+    }
+}
+
+Тепер ми можемо зберігати та завантажувати стан гри, використовуючи нові методи SaveGame та LoadGame:
+
+IGameFactoryWithSerialization gameFactory = new StandardGameFactory();
+IPlayer player1 = gameFactory.CreatePlayer("Human", "X");
+IPlayer player2 = gameFactory.CreatePlayer("Computer", "O");
+IGame game = gameFactory.CreateGame(player1, player2);
+
+// граємо деяку кількість ходів
+
+// зберігаємо гру
+String
+
+Продовжимо код для збереження гри та завантаження її зі збереженого стану:
+
+// зберігаємо гру
+string serializedGame = gameFactory.SaveGame(game);
+// ... деякий час потім ...
+// завантажуємо гру зі збереженого стану
+IGame loadedGame = gameFactory.LoadGame(serializedGame);
+
+Тепер, якщо ми захочемо змінити фабрику гри на BigGameFactory, ми можемо зберегти гру зі старої фабрики та завантажити її з нової:
+
+IGameFactoryWithSerialization bigGameFactory = new BigGameFactory();
+string serializedGame = gameFactory.SaveGame(game);
+IGame loadedGame = bigGameFactory.LoadGame(serializedGame);
+
+За допомогою такої архітектури, ми забезпечуємо розширюваність гри і можливість додавання нових функцій у майбутньому, зберігаючи при цьому простоту та чистоту коду.
+
